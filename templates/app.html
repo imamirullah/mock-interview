@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mock Interview</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <style></style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="left" id="left">
+        <div class="image" id="img"></div>
+      </div>
+      <div class="right" id="right">
+        <button id="logout-btn">Logout</button>
+        <div class="right-card" id="right-card">
+          <div id="heading">
+            <!-- <h1>Choose Technology & Level</h1> -->
+          </div>
+
+          <div class="course-choice">
+            <div>
+              <div class="form-group" id="form-group">
+                <label for="course">Course</label>
+                <select id="course">
+                  <option value="Data Science">Data Science</option>
+                  <option value="Software Testing">Software Testing</option>
+                  <option value="Full Stack">Full Stack</option>
+                  <option value="Python">Python</option>
+                  <option value="Java">Java</option>
+                  <option value="Digital Marketing">Digital Marketing</option>
+                  <option value="Javascript">Javascript</option>
+                  <option value="MERN Stack">MERN Stack</option>
+                  <option value="MEAN Stack">MEAN Stack</option>
+                  <option value="Business Analyst">Business Analyst</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="form-group">
+                <label for="level">Level</label>
+                <select id="level">
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <button class="start-btn" id="start" style="display: block;" onclick="startVideo()">Start Interview</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="container">
+          <div class="video-container" id="videoContainer">
+            <div style="display: flex; flex-direction: column; justify-content: center; ">
+              <div>
+                <video id="cameraFeed" autoplay></video>
+              </div>
+              <div style="display: flex; flex-direction: column;">
+                <div style="display: flex; align-items: center; font-size: 10px;">
+                  <input type="checkbox" name="" id="cehck-box" />I accept to Term & Conditions
+                </div>
+                <button class="continue-btn" id="getQuestion" style="display: none;" onclick="moveVideo()">Start Interview</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="question-container">
+            <div id="loader" style="display: none;">Loading...</div>
+            <p id="questionText" style="display: none;"></p>
+          </div>
+          <div style="display: flex; justify-content: center; align-items: center; margin-top: 50px; gap: 30px;">
+            <button id="nextQuestion" style="display: none;">Next Question</button>
+          </div>
+          <div class="answer-container" id="anser" style="display: none;">
+            <div class="form-group">
+              <p id="speakInstruction" style="display: none; text-align: center; font-weight: bold; color: red;"></p>
+              <div class="div" style="display: flex; gap: 20px;">
+                <span id="checkAnswer" style="display: none; cursor: pointer; "><img style="width: 5vw;" src="../static/images/mic2.png" alt="" /></span>
+                <input type="text" id="userAnswer" placeholder="Please Click on mic to record your answer" />
+              </div>
+            </div>
+          </div>
+          <div id="feedback" class="feedback" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // switch window start
+      
+      document.getElementById('start').addEventListener('click', function () {
+        // Initial Warning Message
+        alert('⚠️ WARNING: You cannot switch tabs or exit fullscreen during the interview. If you do, the session will be terminated immediately! ⚠️')
+      
+        // Function to Enable Fullscreen
+        function enableFullScreen() {
+          let elem = document.documentElement
+      
+          if (elem.requestFullscreen) {
+            elem.requestFullscreen()
+          } else if (elem.mozRequestFullScreen) {
+            // Firefox
+            elem.mozRequestFullScreen()
+          } else if (elem.webkitRequestFullscreen) {
+            // Chrome, Safari, Opera
+            elem.webkitRequestFullscreen()
+          } else if (elem.msRequestFullscreen) {
+            // IE/Edge
+            elem.msRequestFullscreen()
+          }
+        }
+      
+        enableFullScreen() // Activate fullscreen
+      
+        // Hide Cursor
+        document.body.style.cursor = 'none'
+      
+        let warningCount = 0 // Track warnings
+      
+        // Prevent Tab Switching
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) {
+            warningCount++
+            if (warningCount >= 2) {
+              alert('🚨 You switched tabs again! The session is now terminated.')
+              window.location.href = '/logout'
+            } else {
+              alert('⚠️ WARNING: Do not switch tabs! One more violation and the session will be closed.')
+            }
+          }
+        })
+      
+        // Prevent Exiting Fullscreen
+        document.addEventListener('fullscreenchange', function () {
+          if (!document.fullscreenElement) {
+            warningCount++
+            if (warningCount >= 2) {
+              alert('🚨 You exited fullscreen again! The session is now terminated.')
+              window.location.href = '/'
+            } else {
+              alert('⚠️ WARNING: Do not exit fullscreen! One more violation and the session will be closed.')
+              enableFullScreen() // Re-enter fullscreen mode
+            }
+          }
+        })
+      
+        // Disable All Keyboard Input Except Shift + R
+        document.addEventListener(
+          'keydown',
+          function (event) {
+            if (!(event.shiftKey && event.key.toLowerCase() === 'r')) {
+              event.preventDefault()
+              event.stopPropagation()
+              return false
+            }
+          },
+          true
+        )
+      
+        document.addEventListener(
+          'keypress',
+          function (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            return false
+          },
+          true
+        )
+      
+        document.addEventListener(
+          'keyup',
+          function (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            return false
+          },
+          true
+        )
+      
+        // Disable Mouse Actions
+        //  document.addEventListener(
+        //  'mousedown',
+        //    function (event) {
+        //      event.preventDefault()
+        //      event.stopPropagation()
+        //      return false
+        //    },
+        //   true
+        //   )
+      
+        document.addEventListener(
+          'contextmenu',
+          function (event) {
+            event.preventDefault()
+            event.stopPropagation()
+            return false
+          },
+          true
+        )
+      
+        // Close Page on Shift + R
+        document.addEventListener('keydown', function (event) {
+          if (event.shiftKey && event.key.toLowerCase() === 'r') {
+            alert('🚨 Unauthorized activity detected! Session is now terminated.')
+            window.location.href = '/' // Redirect as a fallback
+          }
+        })
+      })
+      
+      // switch window end
+      
+      document.getElementById('logout-btn').addEventListener('click', async function () {
+        let response = await fetch('http://127.0.0.1:5000/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        })
+      
+        let result = await response.json()
+        alert(result.message)
+      
+        window.location.href = '/'
+      })
+    </script>
+    <script src="/static/script.js"></script>
+  </body>
+</html>
