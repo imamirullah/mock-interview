@@ -50,6 +50,9 @@ function speakText(text) {
     utterance.voice = femaleVoice
     synth.speak(utterance)
 }
+function sanitizeText(text) {
+    return text.replace(/[@#$%^&*()_+={}[\]:;"'<>,.?/\\|`~]/g, ""); // Removes special characters
+}
 
 document.getElementById('nextQuestion').addEventListener('click', function () {
     // Stop speech synthesis before moving to the next question
