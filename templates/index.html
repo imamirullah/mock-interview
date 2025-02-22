@@ -170,25 +170,41 @@
       </div>
     </div>
     <script>
-      document.querySelector('.signup form').addEventListener('submit', async function (event) {
-        event.preventDefault()
+           document.querySelector('.signup form').addEventListener('submit', async function (event) {
+        event.preventDefault();  // Prevent the form from submitting the traditional way
       
+        // Get form data
         let userData = {
-          username: this.txt.value,
-          email: this.email.value,
-          phone: this.broj.value,
-          password: this.pswd.value
-        }
+          username: document.querySelector('input[name="txt"]').value,
+          email: document.querySelector('input[name="email"]').value,
+          phone: document.querySelector('input[name="broj"]').value,
+          password: document.querySelector('input[name="pswd"]').value
+        };
       
+        // Send the data to the backend
         let response = await fetch('/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(userData)
-        })
+        });
       
-        let result = await response.json()
-        alert(result.message || result.error)
-      })
+        let result = await response.json();
+      
+        // Show an alert based on the result from the backend
+        alert(result.message || result.error);
+      
+        // If the registration is successful, clear the fields and switch to the login form
+        if (result.message === "User registered successfully") {
+          // Clear input fields if registration is successful
+          document.querySelector('input[name="txt"]').value = '';  // username
+          document.querySelector('input[name="email"]').value = ''; // email
+          document.querySelector('input[name="broj"]').value = '';  // phone
+          document.querySelector('input[name="pswd"]').value = '';  // password
+      
+          // Switch to login form
+          document.getElementById('chk').checked = true;
+        }
+      });
       
       document.querySelector('.login form').addEventListener('submit', async function (event) {
         event.preventDefault()
